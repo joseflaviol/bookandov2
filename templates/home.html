@@ -1,0 +1,79 @@
+{% extends '_base.html' %}
+
+{% block title %}Home{% endblock title %}
+
+{% block content %}
+<div id="app">
+  <form class="row g-3" v-on:submit="search">
+    <div class="col-auto">
+      <label for="bookTitle" class="visually-hidden">Book title</label>
+      <input type="text" class="form-control" id="bookTitle" name="bookTitle" placeholder="Type your search..." v-model="bookTitle" required>
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-outline-dark">Search</button>
+    </div>
+  </form>
+  <div class="row">
+    <div class="card m-5" v-for="book in books" style="width: 18rem;">
+      <div v-if="book.volumeInfo.imageLinks">
+        <img v-bind:src="book.volumeInfo.imageLinks.thumbnail" class="card-img-top"
+          alt="Fissure in Sandstone" />
+        <div class="card-body">
+          <h5 class="card-title">[[ book.volumeInfo.title ]]</h5>
+          <p class="card-text" v-if="book.volumeInfo.authors">
+          [[ book.volumeInfo.authors[0] ]]
+          </p>
+          <button type="button" class="btn btn-primary" v-on:click="bookDetails(book)">Ver Mais</button>
+        </div>
+      </div>
+      <div v-else>
+        <div class="card-body">
+          <h5 class="card-title">[[ book.volumeInfo.title ]]</h5>
+          <p class="card-text" v-if="book.volumeInfo.authors">
+          [[ book.volumeInfo.authors[0] ]]
+          </p>
+          <button type="button" class="btn btn-primary" v-on:click="bookDetails(book)">Ver Mais</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script type="text/javascript">
+    new Vue({
+      el: '#app',
+      delimiters: ['[[', ']]'],
+      data: {
+        bookTitle: null,
+        books: null,
+      },
+      methods: {
+        search: function(e) {
+            e.preventDefault();
+            if (this.bookTitle != null && this.bookTitle != "") {
+              let url = "/search/";
+              fetch(url.concat(this.bookTitle))
+                  .then(response => response.json())
+                  .then(data => {
+                      this.books = data.items;
+                  });
+            }
+        },
+        bookDetails: function(book) {
+          /*let bookJSON = JSON.stringify({
+            "title": book.volumeInfo.title,
+            "author": book.volumeInfo.authors : book.volumeInfo.authors[0] ? null,
+            "description": book.volumeInfo.description : book.volumeInfo.description ? null,
+            "pageCount": book.volumeInfo.pageCount : book.volumeInfo.pageCount ? null,
+            "thumbnail": book.volumeInfo.imageLinks : book.volumeInfo.imageLinks.thumbnail ? null
+          });*/
+          localStorage.setItem("book", JSON.stringify(book));
+          window.location.href = "{% url 'book_details' %}";
+        }
+      }
+    });
+</script>
+{% endblock scripts %}

@@ -1,0 +1,56 @@
+{% extends '_base.html' %}
+
+{% block title %}Home{% endblock title %}
+
+{% block content %}
+<div id="app">
+  <div class="container m-5">
+            <div class="row d-flex align-items-start justify-content-evenly">
+                <div class="col-4 d-flex justify-content-center">
+                    <div>
+                        <h2>[[ book.volumeInfo.title ]]</h2>
+                        <h5>[[ book.volumeInfo.authors[0] ]]</h5>
+                        <img v-if="book.volumeInfo.imageLinks" v-bind:src="book.volumeInfo.imageLinks.thumbnail" class="img-fluid rounded" alt="...">
+                    </div>
+                </div>
+                <div class="col-4 d-flex justify-content-center">
+                    <div>
+                        <h4>Description</h4>
+                        <p>[[ book.volumeInfo.description ]]</p>
+                        <h4><b>Page count</b>: [[ book.volumeInfo.pageCount ]]</h4>
+                    </div>
+                </div>
+                <div class="col-4 d-flex justify-content-center">
+                    <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+                        <button type="button" class="btn btn-primary bg-success" v-on:click="favorite()" ref="botaoFavorito">Add to Favorites</button>
+                        <button type="button" class="btn btn-primary bg-info" v-on:click="furtherReading()" ref="botaoFuturaLeitura">Add to Further Reading</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script type="text/javascript">
+    new Vue({
+      el: '#app',
+      delimiters: ['[[', ']]'],
+      data: {
+        book: null,
+      },
+      methods: {
+        getBook: function() {
+            this.book = JSON.parse(localStorage.getItem('book'));
+            if (this.book == null) {
+                window.location.replace("{% url 'home' %}");
+            }
+        }
+      },
+      beforeMount() {
+        this.getBook();
+      }
+    });
+</script>
+{% endblock scripts %}
